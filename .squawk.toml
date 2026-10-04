@@ -1,0 +1,13 @@
+pg_version = "18.0"
+assume_in_transaction = false
+fail_on_violations = true
+excluded_rules = [
+]
+included_rules = [
+  "ban-drop-database",
+  "ban-drop-table",
+  "changing-column-type",
+  "prefer-bigint-over-int",
+  "prefer-bigint-over-smallint",
+  "prefer-identity",
+]

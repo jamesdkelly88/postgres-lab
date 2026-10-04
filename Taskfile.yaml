@@ -1,0 +1,114 @@
+version: '3'
+
+dotenv: ['.env']
+
+vars:
+  PGVERSION: 18
+
+tasks:
+  list:
+    desc: List all tasks
+    cmds:
+    - task --list
+    silent: true
+
+  # docker
+  docker-up:
+    aliases: 
+    - docker-start
+    - up
+    - start
+    desc: Run Postgres in Docker
+    dir: ./docker/postgres{{.PGVERSION}}
+    cmds:
+    - docker compose pull
+    - docker compose up -d
+    silent: true 
+
+  docker-down :
+    aliases:
+    - docker-stop
+    - down
+    - stop
+    desc: Stop Postgres Docker container
+    dir: ./docker/postgres{{.PGVERSION}}
+    cmds:
+    - docker compose down
+    silent: true 
+
+  docker-destroy:
+    aliases:
+    - docker-delete
+    - docker-remove
+    - remove
+    desc: Stop Postgres Docker container and delete volumes
+    dir: ./docker/postgres{{.PGVERSION}}
+    cmds:
+    - docker compose down --volumes
+    silent: true 
+
+  # pgschema
+  pgschema-setup:
+    desc: Setup database for pgschema
+    dir: ./pgschema
+    cmds:
+    - ./setup.sh ../.env
+    silent: true
+  
+  pgschema-dump:
+    aliases:
+    - dump
+    desc: Dump database schema to files using pgschema
+    dir: ./pgschema
+    cmds:
+    - ./dump.sh ../.env {{.SCHEMAS}}
+    requires:
+      vars: [ SCHEMAS ]
+    silent: true
+
+  pgschema-plan:
+    aliases:
+    - plan
+    desc: Plan database schema changes with pgschema
+    dir: ./pgschema
+    cmds:
+    - ./plan.sh ../.env {{.SCHEMAS}}
+    requires:
+      vars: [ SCHEMAS ]
+    silent: true
+
+  pgschema-apply:
+    aliases:
+    - apply
+    desc: Apply database schema changes with pgschema
+    dir: ./pgschema
+    cmds:
+    - ./apply.sh ../.env {{.SCHEMAS}}
+    requires:
+      vars: [ SCHEMAS ]
+    silent: true
+  
+  # psql
+  psql-connect:
+    aliases:
+    - connect
+    desc: Connect to Postgres using psql
+    cmds:
+    - psql
+    silent: true
+
+  # sqlfluff
+  sqlfluff:
+    desc: Lint (or fix) database schema with SqlFluff
+    cmds:
+    - sqlfluff {{.ACTION}} databases/{{.PGDATABASE}}
+    silent: true
+    vars:
+      ACTION: '{{.ACTION | default "lint" }}'
+
+  # squawk
+  squawk:
+    desc: Lint all migration files with Squawk
+    cmds:
+    - squawk pgschema/output_*.sql
+    silent: true

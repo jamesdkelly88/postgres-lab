@@ -3,7 +3,7 @@
 --
 
 CREATE TABLE IF NOT EXISTS orders (
-    id SERIAL,
-    info xml NOT NULL,
-    CONSTRAINT orders_pkey PRIMARY KEY (id)
+  id SERIAL,
+  info XML NOT NULL,
+  CONSTRAINT orders_pkey PRIMARY KEY (id)
 );

@@ -1,0 +1,19 @@
+services:
+  postgres18:
+    container_name: postgres18
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+    image: postgres:18-alpine
+    ports:
+    - 5432:5432
+    restart: unless-stopped
+    volumes:
+    - data:/var/lib/postgresql
+
+networks:
+  default:
+    name: postgres18
+
+volumes:
+  data:

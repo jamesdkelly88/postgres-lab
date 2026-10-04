@@ -6,7 +6,7 @@ if [ -z $2 ]; then echo "Usage: apply.sh <env_file_name> <comma_separated_schema
 declare envFile=$1
 declare schemas=$2
 
-export $(cat $envFile | xargs)
+export $(grep -v ^# $envFile | xargs)
 
 echo "Database: ${PGDATABASE}"
 

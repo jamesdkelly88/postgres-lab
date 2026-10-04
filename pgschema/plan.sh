@@ -6,20 +6,23 @@ if [ -z $2 ]; then echo "Usage: plan.sh <env_file_name> <comma_separated_schema_
 declare envFile=$1
 declare schemas=$2
 
-export $(cat $envFile | xargs)
+declare SCHEMADIR="../databases"
+
+export $(grep -v ^# $envFile | xargs)
 
 rm -f output*
 
 echo "Database: ${PGDATABASE}"
 
-if [ -f "${PGDATABASE}/extensions.sql" ]; then
+if [ -f "${SCHEMADIR}/${PGDATABASE}/extensions.sql" ]; then
     echo "Adding extensions"
-    psql -f "${PGDATABASE}/extensions.sql"
+    psql -f "${SCHEMADIR}/${PGDATABASE}/extensions.sql"
 
     if [ -n "${PGSCHEMA_PLAN_DB}" ]; then
         PGPASSTEMP=$PGPASSWORD
         PGPASSWORD=$PGSCHEMA_PLAN_PASSWORD
-        psql -h $PGSCHEMA_PLAN_HOST -p $PGSCHEMA_PLAN_PORT -U $PGSCHEMA_PLAN_USER -d $PGSCHEMA_PLAN_DB -f "${PGDATABASE}/extensions.sql"
+        echo "Adding extensions to ${PGSCHEMA_PLAN_DB}"
+        psql -h $PGSCHEMA_PLAN_HOST -p $PGSCHEMA_PLAN_PORT -U $PGSCHEMA_PLAN_USER -d $PGSCHEMA_PLAN_DB -f "${SCHEMADIR}/${PGDATABASE}/extensions.sql"
         PGPASSWORD=$PGPASSTEMP
     fi
 
@@ -37,5 +40,7 @@ do
         PGPASSWORD=$PGPASSTEMP
     fi
 
-    pgschema plan --file "${PGDATABASE}/${s}/${s}.sql" --schema $s --output-human "output_${s}.txt" --output-sql "output_${s}.sql" --output-json "output_${s}.json"
+    pgschema plan --file "${SCHEMADIR}/${PGDATABASE}/${s}/${s}.sql" --schema $s --output-human "output_${s}.txt" --output-sql "output_${s}.sql" --output-json "output_${s}.json"
+
+    cat "output_${s}.txt"
 done
