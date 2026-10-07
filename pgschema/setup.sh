@@ -3,6 +3,8 @@ set -e
 
 if [ -z $1 ]; then echo "Usage: plan.sh <env_file_name>"; exit 1; fi
 
+SCRIPT_DIR="$(dirname "$0")"
+
 declare envFile=$1
 
 export $(grep -v ^# $envFile | xargs)
@@ -20,7 +22,7 @@ psql -d postgres \
   --set=automation_password="$AUTOPASSWORD" \
   --set=db_name="staging" \
   --set=owner_role="staging_owner" \
-  -f ./setup.sql 
+  -f "$SCRIPT_DIR/setup.sql" 
 
 echo "Database: ${PGDATABASE}"
 
@@ -29,4 +31,4 @@ psql -d postgres \
   --set=automation_password="$AUTOPASSWORD" \
   --set=db_name="$PGDATABASE" \
   --set=owner_role="${PGDATABASE}_owner" \
-  -f ./setup.sql 
+  -f "$SCRIPT_DIR/setup.sql" 

@@ -3,10 +3,12 @@ set -e
 
 if [ -z $2 ]; then echo "Usage: plan.sh <env_file_name> <comma_separated_schema_list>"; exit 1; fi
 
+SCRIPT_DIR="$(dirname "$0")"
+
 declare envFile=$1
 declare schemas=$2
 
-declare SCHEMADIR="../databases"
+declare SCHEMADIR="${SCRIPT_DIR}/../databases"
 
 export $(grep -v ^# $envFile | xargs)
 
@@ -40,7 +42,10 @@ do
         PGPASSWORD=$PGPASSTEMP
     fi
 
-    pgschema plan --file "${SCHEMADIR}/${PGDATABASE}/${s}/${s}.sql" --schema $s --output-human "output_${s}.txt" --output-sql "output_${s}.sql" --output-json "output_${s}.json"
+    pgschema plan --file "${SCHEMADIR}/${PGDATABASE}/${s}/${s}.sql" --schema $s \
+        --output-human "${SCRIPT_DIR}/output_${s}.txt" \
+        --output-sql "${SCRIPT_DIR}/output_${s}.sql" \
+        --output-json "${SCRIPT_DIR}/output_${s}.json"
 
-    cat "output_${s}.txt"
+    cat "${SCRIPT_DIR}/output_${s}.txt"
 done
