@@ -2,6 +2,8 @@ $ErrorActionPreference = "Stop"
 $InformationPreference = "Continue"
 $WarningPreference = "Continue"
 
+# TODO: convert to Pester suite
+
 foreach($f in Get-ChildItem "$PSScriptRoot/functions/*.ps1")
 {
   . $f.FullName
@@ -24,8 +26,24 @@ if($conn.State -eq 'Closed')
 
 try 
 {
-  $version = Invoke-PostgresCmd $conn "SELECT version();" Scalar
-  $version
+  $query = "SELECT * FROM pg_roles"
+  
+  foreach($mode in (Get-Command "Invoke-PostgresCmd").Parameters["OutputType"].Attributes.ValidValues)
+  {
+    Write-Host ("=" * 80)
+    Write-Host $mode
+    $value = Invoke-PostgresCmd $conn $query $mode
+    if($value)
+    {
+      Write-Host $value.GetType()
+      $value | Format-Table
+    }
+    else
+    {
+      Write-Host "Null`n"
+    }
+    Clear-Variable "value"
+  }
 }
 catch 
 {
@@ -37,7 +55,7 @@ finally
 }
 
 
-
+Backup-PostgresDatabase
 
 
 

@@ -16,9 +16,15 @@ function Get-PostgresConnectionString {
       [Parameter(Position = 4)]
       [string]$SslMode = $env:PGSSLMODE,
       [Parameter(Position = 5)]
-      [string]$OdbcDriver = "PostgreSQL"
+      [string]$OdbcDriver = ""
   )
 
+  if([String]::IsNullOrEmpty($OdbcDriver))
+  {
+    $drivers = if ($IsWindows) { (Get-OdbcDriver).Name } else { odbcinst -q -d | ForEach-Object { $_.Trim('[', ']') } }
+    $OdbcDriver = $drivers.Where{ $_.ToUpper() -like "*POSTGRES*"}[0]
+  }
+  if([String]::IsNullOrEmpty($OdbcDriver)){ throw "Driver not specified or found from installed options" }
   if([String]::IsNullOrEmpty($Server)) { throw "Server required" }
   if([String]::IsNullOrEmpty($Username)) { throw "Username required" }
   if([String]::IsNullOrEmpty($Password)) { throw "Password required" }
