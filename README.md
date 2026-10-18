@@ -2,14 +2,29 @@
 
 A collection of PostgreSQL sample scripts, databases and tool configs for testing.
 
+- `databases` - database schemas for deploying
 - `docker` - compose files for running PostgreSQL containerised
 - [`pgschema`](#pgschema) - declarative schema migrations
+- `sample_data` - datasets / download scripts for sample database schemas
+- `scripts` - general automation and common functions for tool-specific scripts
 - [`sqlfluff`](#sqlfluff) - linter for checking syntax and style
 - [`squawk`](#squawk) - linter for catching breaking or blocking changes
 <!-- - [`terraform`](https://registry.terraform.io/providers/cyrilgdn/postgresql/latest/docs) - database configuration as code
 - sample databases
 - sample queries
 - sample pipelines -->
+
+## General System requirements
+
+- bash
+- docker
+- odbc + postgresql driver
+- powershell
+- psql / pgadmin
+- task
+
+Then some of these tools/scripts need other things as well (listed in their own sections)
+
 
 # [pgschema](https://www.pgschema.com/)
 
