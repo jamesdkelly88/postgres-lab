@@ -4,6 +4,7 @@ A collection of PostgreSQL sample scripts, databases and tool configs for testin
 
 - `databases` - database schemas for deploying
 - `docker` - compose files for running PostgreSQL containerised
+- [`lxc`](#lxc) - lightweight solution for running a full PostgreSQL install
 - [`pgschema`](#pgschema) - declarative schema migrations
 - `sample_data` - datasets / download scripts for sample database schemas
 - `scripts` - general automation and common functions for tool-specific scripts
@@ -25,6 +26,27 @@ A collection of PostgreSQL sample scripts, databases and tool configs for testin
 
 Then some of these tools/scripts need other things as well (listed in their own sections)
 
+# [lxc](https://linuxcontainers.org/)
+
+Docker is fine for running a simple PostgreSQL setup and for testing the default extensions, tools and queries. However, for some scenarios, a full install is required (and not the ideal use case for Docker). 
+
+Virtual machines are great, but resource-heavy, and most of the deployments I use are Alpine-based, so they are overkill. Linux containers provide a full, persistant operating system, so can be used for installing packages, extensions and performing local filesystem operations.
+
+## Setup
+
+- Install `lxc`
+- List containers: `sudo lxc-ls --fancy`
+- Create container: `sudo lxc-create --name ct --template download -- --dist alpine --release 3.24 --arch amd64`
+- Start container: `sudo lxc-start --name ct`
+- Connect: `sudo lxc-attach --name ct --clear-env`
+- Get IP address: `sudo lxc-info --name ct` or `sudo lxc-info --name ct -iH | head -n 1` for scripts
+- Run a command: `sudo lxc-attach ct -- command args`
+- Stop: `sudo lxc-stop --name ct`
+- Destroy: `sudo lxc-destroy --name ct`
+
+Files can be copied to the container either
+- over the network e.g. via `scp` after installing `openssh`
+- via the filesystem on the host: `/var/lib/lxc/ct/rootfs/path/on/container`
 
 # [pgschema](https://www.pgschema.com/)
 
